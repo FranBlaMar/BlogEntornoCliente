@@ -2,52 +2,59 @@ let botonComent = document.getElementById("añadirComent");
 botonComent.addEventListener("click",añadirComentario);
 
 
-let peticion = new XMLHttpRequest();
 let id = window.location.search;
+window.addEventListener("load",function(){
+    fetch(`http://localhost:3000/posts/${id}`)
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+        }
+        return Promise.reject(res) 
+    })
+    .then(datos=>{
+        datos.forEach (dato => {
+            let cuerpo=document.getElementById("cuerpo");
+            let textoNode = document.createTextNode(dato.cuerpo);
+            cuerpo.appendChild(textoNode);
+            let titulo=document.getElementById("titulo");
+            let textoNode2 = document.createTextNode(dato.title);
+            titulo.appendChild(textoNode2);
+        })
+    })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
 
-peticion.open("GET", `http://localhost:3000/posts/${id}`);
-peticion.send();
-//añadimos evento a la peticion
-peticion.addEventListener("load",function(){
-    if(peticion.status == 200){
-        //Guardamos el array con todos los posts
-        let datos = JSON.parse(peticion.responseText);
-        let cuerpo=document.getElementById("cuerpo");
-        let textoNode = document.createTextNode(datos[0].cuerpo);
-        cuerpo.appendChild(textoNode);
-        let titulo=document.getElementById("titulo");
-        let textoNode2 = document.createTextNode(datos[0].title);
-        titulo.appendChild(textoNode2);
-    }
-})
-
-let formulario = document.getElementById("formComent");
-let peticion1 = new XMLHttpRequest();
-peticion1.open("GET", `http://localhost:3000/users`);
-peticion1.send();
-//añadimos evento a la peticion
-peticion1.addEventListener("load",function(){
-    if(peticion1.status == 200){
-        let usuarios = JSON.parse(peticion1.responseText);
-        usuarios.forEach(dato=>{
+    let formulario = document.getElementById("formComent");
+    fetch(`http://localhost:3000/users`)
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+        }
+        return Promise.reject(res) 
+    })
+    .then(datos=>{
+        datos.forEach(dato=>{
             let select = document.getElementById("users");
             let option = document.createElement("option");
             option.value = dato.nombre.toUpperCase();
             option.innerHTML=`${dato.nombre.toUpperCase()}`;
             select.appendChild(option);
         });
-    }
-})
+    })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
 
-let seccionComentarios = document.getElementById("comentariosDeUsuarios");
-let peticion2 = new XMLHttpRequest();
-peticion2.open("GET", `http://localhost:3000/comments`);
-peticion2.send();
-//añadimos evento a la peticion
-peticion2.addEventListener("load",function(){
-    if(peticion2.status == 200){
-        //Guardamos el array con todos los posts
-        let datosComents = JSON.parse(peticion2.responseText);
+    let seccionComentarios = document.getElementById("comentariosDeUsuarios");
+    fetch(`http://localhost:3000/comments`)
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+        }
+        return Promise.reject(res) 
+    })
+    .then(datosComents=>{
         datosComents.forEach(dato => {
             if (`?id=${dato.idPost}` == id){
                 let autor = document.createElement("p");
@@ -70,25 +77,48 @@ peticion2.addEventListener("load",function(){
                 seccionComentarios.appendChild(fecha);
             }
         }); 
-    }
-})
+    })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
 
-formulario.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    añadirComentario();
+    formulario.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        añadirComentario();
+    })
+
+      
 })
 
 let idP = (new URLSearchParams(window.location.search)).get("id");
-function añadirComentario(){
-    const datosComent={
-        usuario: document.getElementById("users").value,
-        cuerpo: document.getElementById("TextoComentario").value,
-        fecha: (new Date (Date.now())).toDateString(),
-        idPost: idP,
+    function añadirComentario(){
+        const datosComent={
+            usuario: document.getElementById("users").value,
+            cuerpo: document.getElementById("TextoComentario").value,
+            fecha: (new Date (Date.now())).toDateString(),
+            idPost: idP,
+        }
+        fetch(`http://localhost:3000/comments`,{
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json",
+            },
+            body: JSON.stringify(datosComent)
+        })
+        .then(res =>{
+        if(res.ok){
+            return res.json();
+            formulario.reload();
+        }
+        return Promise.reject(res) 
+    })
+       .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+        });
     }
-    let peticion = new XMLHttpRequest();
-    peticion.open("POST", `http://localhost:3000/comments`);
-    peticion.setRequestHeader('Content-type', 'application/json');
-    peticion.send(JSON.stringify(datosComent));
-    formulario.reload();
-}
+
+
+
+
+
+

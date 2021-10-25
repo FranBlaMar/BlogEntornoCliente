@@ -1,9 +1,14 @@
 window.addEventListener("load",function(){
     fetch('http://localhost:3000/posts')
-    .then(res => res.json())
-    .then (res=> {
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+        }
+        return Promise.reject(res) 
+    })
+    .then (datos=> {
         //Guardamos el array con todos los posts
-        res.forEach (post => {
+        datos.forEach (post => {
             /*Creacion de cada celda de la tabla. Se usa un bucle for para crear tantas celdas como datos
             nos haya devuelto la peticion GET.
             Se crea un tr donde añadimos el restos de tds con los datos del autor, titulo y los botones de borrar y ver*/
@@ -41,6 +46,9 @@ window.addEventListener("load",function(){
             document.getElementById("tabla").appendChild(tr);
         })
     })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
 })
 
 //Cómo obtener los parámetros de la URL usando JavaScript.
@@ -50,7 +58,12 @@ function borrarPost (e){
         method:"DELETE",
     })
     //añadimos evento a la peticion
-    .then(res => res.json())
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+        }
+        return Promise.reject(res) 
+    })
     .then(res =>{
         console.log(res);
         alert("Post Borrado :(");
@@ -58,12 +71,20 @@ function borrarPost (e){
         let tr = document.getElementsByTagName("tr")[posicion];
         tabla.removeChild(tr);
     })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
 }
 
 
 window.addEventListener("load",function(){
     fetch("http://localhost:3000/users")
-    .then(res=> res.json())
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+        }
+        return Promise.reject(res) 
+    })
     .then(res => {
         res.forEach(usuario=>{
             let select = document.getElementById("users");
@@ -73,6 +94,9 @@ window.addEventListener("load",function(){
             select.appendChild(option);
         });
     })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
 })
 
 
@@ -97,5 +121,15 @@ function añadirPost(){
         },
         body: JSON.stringify(datosPost)   
         })
-    formulario.reload();
+    .then(res =>{
+        if(res.ok){
+            return res.json();
+            formulario.reload();
+        }
+        return Promise.reject(res) 
+    })
+    .catch(err => {
+        console.log('Error en la petición HTTP: '+err.message);
+    });
+    
 }

@@ -80,6 +80,20 @@
       "fecha": "Wed Oct 20 2021",
       "idPost": "6",
       "id": 7
+    },
+    {
+      "usuario": "PRUEBA",
+      "cuerpo": "Que guay :D",
+      "fecha": "Mon Oct 25 2021",
+      "idPost": "1",
+      "id": 8
+    },
+    {
+      "usuario": "DAVID",
+      "cuerpo": "Increible",
+      "fecha": "Mon Oct 25 2021",
+      "idPost": "5",
+      "id": 9
     }
   ],
   "users": [
